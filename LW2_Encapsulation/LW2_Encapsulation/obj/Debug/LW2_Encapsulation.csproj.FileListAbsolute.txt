@@ -1,0 +1,7 @@
+C:\Users\sjdro\source\repos\LW2_Siadro\LW2_Encapsulation\LW2_Encapsulation\bin\Debug\LW2_Encapsulation.exe.config
+C:\Users\sjdro\source\repos\LW2_Siadro\LW2_Encapsulation\LW2_Encapsulation\bin\Debug\LW2_Encapsulation.exe
+C:\Users\sjdro\source\repos\LW2_Siadro\LW2_Encapsulation\LW2_Encapsulation\bin\Debug\LW2_Encapsulation.pdb
+C:\Users\sjdro\source\repos\LW2_Siadro\LW2_Encapsulation\LW2_Encapsulation\obj\Debug\LW2_Encapsulation.csproj.AssemblyReference.cache
+C:\Users\sjdro\source\repos\LW2_Siadro\LW2_Encapsulation\LW2_Encapsulation\obj\Debug\LW2_Encapsulation.csproj.CoreCompileInputs.cache
+C:\Users\sjdro\source\repos\LW2_Siadro\LW2_Encapsulation\LW2_Encapsulation\obj\Debug\LW2_Encapsulation.exe
+C:\Users\sjdro\source\repos\LW2_Siadro\LW2_Encapsulation\LW2_Encapsulation\obj\Debug\LW2_Encapsulation.pdb
