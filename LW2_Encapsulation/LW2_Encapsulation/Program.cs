@@ -1,6 +1,8 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Management.Instrumentation;
 using System.Runtime.ConstrainedExecution;
@@ -17,7 +19,7 @@ namespace LW2_Encapsulation
         private string model; // модель машини
         private int year; // рік виготовлення
         private int odometr; // пробіг
-        private int fuelLevel; // рівень палива (у відсотках)
+        private int fuelLevel; // рівень палива
 
         // оголошення публічних властивостей
         public string Make // властивість марки (читання та запис)
@@ -40,7 +42,8 @@ namespace LW2_Encapsulation
 
         public int Odometr // властивість пробігу (тільки запис)
         {
-            set { year = value; }
+            set { if (value >= 0)
+                odometr = value; }
         }
 
         public int FuelLevel // властивість рівню палива (читання та запис із перевіркою, щоб значення було від 0 до 100)
@@ -72,41 +75,39 @@ namespace LW2_Encapsulation
                                           //збільшуючи пробіг та зменшуючи рівень палива (у відсотках)
         {
             odometr += kilometers; // додавання пройдений шлях до пробігу
-            if (kilometers >= 0) // перевірка, щоб шлях був не від'ємним числом
+            for (int i = 1; i <= kilometers / 10; i++) // цикл, який буде ділити шлях до тих пір, поки число не буде нуль 
             {
-                for (int i = 1; i <= kilometers/10; i++) // цикл, який буде ділити шлях до тих пір, поки число не буде нуль 
-                {
-                    fuelLevel -= 1; // рівень палива знижуеться на 1% (1 літр) кожні 10 км
-                }
+                fuelLevel -= 1; // рівень палива знижуеться на 1% (1 літр) кожні 10 км
             }
-
+            
             Console.WriteLine("\n Odometr: {0} km\n" +
-                " Fuel level: {1}%", odometr, fuelLevel);
+                " Fuel level: {1}%", odometr, fuelLevel);        
         }
 
-        public void Refuel(int percentage) // публічний метод
+        public void Refuel(int percentage) // публічний метод із параметром, що реалізує підвищення рівня палива
         {
             double checkingFuelLevel;
             checkingFuelLevel = fuelLevel + percentage;
 
-            if (checkingFuelLevel <= 100)
+            switch (checkingFuelLevel <= 100) // перевірка на рівень палива, щоб не був більше 100
             {
-                fuelLevel += percentage;
-                PrintInfo();
-            }
-            else
-            {
-                Console.WriteLine(" Goes over the limit of the allowable number of liters of fuel.");
-            }
+                case 0 <= 100: 
+                    fuelLevel += percentage; // до існуючого рівня палива додається певне число (%)
+                    PrintInfo(); // метод, що виводить інформацію в консоль
+                    break;
 
+                default:
+                    Console.WriteLine(" Goes over the limit of the allowable number of liters of fuel."); // повідомлення про помилку
+                    break;
+            }
         }
 
-        public void Service()
+        public void Service() // метод без параметрів, що обнуляє значення 
         {
             odometr = 0;
         }
 
-        public void PrintInfo()
+        public void PrintInfo() // метод без параметрів, що виводить інформацію в консоль
         {
             Console.WriteLine("\n |Machine features|\n" +
                 " ---------------------------------\n" +
@@ -122,19 +123,20 @@ namespace LW2_Encapsulation
     {
         static void Main(string[] args)
         {
-            int traveledKilometers;
-            int refuelLevel;
-            int percentageFuelLevel = 100;
+            int traveledKilometers; // кілометри, які були пройдені
+            int refuelLevel; // кількість для відновлення рівня палива (у %)
+            int percentageFuelLevel = 100; // рівень палива (у %)
 
             try
             {
-                Console.WriteLine("\n Enter the make of the machine: " +
-                "Tesla | Toyota | Ford | Honda | BMW");
+                // перші три значення (марка, модель та рік виготовлення), які вводить користувач
+                Console.WriteLine("\n Enter the make of the machine:\n " +
+                    "[Tesla | Toyota | Ford | Honda | BMW]");
                 Console.Write(" Make: ");
                 string make = Console.ReadLine();
 
-                Console.WriteLine("\n Enter the model of the machine: " +
-                    "Coupe | Sport Car | Sedan | Station Wagon | Minivan");
+                Console.WriteLine("\n Enter the model of the machine:\n " +
+                    "[Coupe | Sport Car | Sedan | Station Wagon | Minivan]");
                 Console.Write(" Model: ");
                 string model = Console.ReadLine();
 
@@ -142,26 +144,55 @@ namespace LW2_Encapsulation
                 Console.Write(" Year: ");
                 int year = Convert.ToInt32(Console.ReadLine());
 
+                // створення об'єкту (машини)
                 Car car = new Car(make, model, year);
                 car.FuelLevel = percentageFuelLevel;
                 car.PrintInfo();
 
+                // користувач вводить кількість кілометрів, які проїде машина
                 Console.Write(" ---------------------------------\n" +
                     " You have driven (km): ");
                 traveledKilometers = Convert.ToInt32(Console.ReadLine());
 
-                car.Drive(traveledKilometers);
+                switch (traveledKilometers > 0) // перевірка, щоб значення не було від'ємним
+                {
+                    case 1 > 0:
+                        car.Drive(traveledKilometers); // звернення до метода, що додає значення до пробігу та зменшує рівень палива
 
-                Console.Write(" ---------------------------------\n" +
-                    " Trying to refuel (%): ");
-                refuelLevel = Convert.ToInt32(Console.ReadLine());
-                car.Refuel(refuelLevel);
+                        switch (car.FuelLevel <= 0) // перевірка рівня палива
+                        {
+                            case 1 >= 0:
+                                Console.WriteLine("\n Fuel level has dropped 0%");
+                                break;
 
-                Console.Write(" ---------------------------------\n" +
-                    " To be serviced.\n" +
-                    " ---------------------------------\n");
-                car.Service();
-                car.PrintInfo();
+                            case 1 <= 0:
+                                Console.Write(" ---------------------------------\n" +
+                                    " Trying to refuel (%): ");
+                                refuelLevel = Convert.ToInt32(Console.ReadLine()); // ввід значення для відновлення рівня палива
+
+                                switch (refuelLevel > 0) // перевірка рівня палива, щоб значення не було негативним
+                                {
+                                    case 1 > 0:
+                                        car.Refuel(refuelLevel); // звернення до метода, що відновлює рівень палива
+                                       
+                                        Console.Write(" ---------------------------------\n" +
+                                            " To be serviced.\n");
+                                        car.Service(); // звернення до метода, що оновлює стан машини (скидає лічильник пробігу)
+                                        car.PrintInfo(); // звернення до метода, що виводить інформацію в консоль
+                                        break;
+
+                                    case 1 < 0:
+                                        Console.WriteLine(" The value cannot be negative!");
+                                        break;
+                                }
+                                break;
+                        }
+                        break;
+
+                case 1 < 0:
+                    Console.WriteLine(" The value cannot be negative!");
+                    break;
+                }
             } 
             catch
             {
